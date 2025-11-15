@@ -1,227 +1,247 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Logistics Tycoon</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Courier New', monospace;
-            background: #000;
-            color: #0f0;
-            overflow: hidden;
-        }
-        
-        #game-container {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-        }
-        
-        #canvas-container {
-            flex: 1;
-            position: relative;
-        }
-        
-        canvas {
-            display: block;
-            background: #000;
-        }
-        
-        #ui-panel {
-            width: 350px;
-            background: #111;
-            border-left: 2px solid #0f0;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 12px;
-        }
-        
-        h1, h2, h3 {
-            color: #0ff;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px #0ff;
-        }
-        
-        h1 { font-size: 20px; }
-        h2 { font-size: 16px; margin-top: 20px; }
-        h3 { font-size: 14px; margin-top: 15px; }
-        
-        .stat {
-            margin: 5px 0;
-            padding: 3px;
-            background: #0a0a0a;
-        }
-        
-        .stat-label {
-            color: #0f0;
-        }
-        
-        .stat-value {
-            color: #fff;
-            float: right;
-        }
-        
-        button {
-            background: #003300;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 8px 15px;
-            margin: 5px 5px 5px 0;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            transition: all 0.2s;
-        }
-        
-        button:hover {
-            background: #005500;
-            box-shadow: 0 0 10px #0f0;
-        }
-        
-        button:disabled {
-            background: #111;
-            color: #333;
-            border-color: #333;
-            cursor: not-allowed;
-        }
-        
-        .route-list, .vehicle-list, .goods-list {
-            max-height: 200px;
-            overflow-y: auto;
-            margin: 10px 0;
-            border: 1px solid #0f0;
-            padding: 5px;
-            background: #0a0a0a;
-        }
-        
-        .item {
-            padding: 5px;
-            margin: 3px 0;
-            background: #001100;
-            border-left: 3px solid #0f0;
-        }
-        
-        .item:hover {
-            background: #002200;
-        }
-        
-        .clearfix::after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-        
-        #tooltip {
-            position: absolute;
-            background: rgba(0, 50, 0, 0.95);
-            border: 1px solid #0f0;
-            padding: 10px;
-            pointer-events: none;
-            display: none;
-            z-index: 1000;
-            max-width: 250px;
-            font-size: 11px;
-        }
-        
-        select {
-            background: #001100;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 5px;
-            font-family: 'Courier New', monospace;
-            width: 100%;
-            margin: 5px 0;
-        }
-        
-        .profit { color: #0f0; }
-        .loss { color: #f00; }
-    </style>
-</head>
-<body>
-    <div id="game-container">
-        <div id="canvas-container">
-            <canvas id="gameCanvas"></canvas>
-            <div id="tooltip"></div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Space Logistics Tycoon</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Courier New', monospace;
+                background: #000;
+                color: #0f0;
+                overflow: hidden;
+            }
+
+            #game-container {
+                display: flex;
+                width: 100vw;
+                height: 100vh;
+            }
+
+            #canvas-container {
+                flex: 1;
+                position: relative;
+            }
+
+            canvas {
+                display: block;
+                background: #000;
+            }
+
+            #ui-panel {
+                width: 350px;
+                background: #111;
+                border-left: 2px solid #0f0;
+                padding: 15px;
+                overflow-y: auto;
+                font-size: 12px;
+            }
+
+            h1,
+            h2,
+            h3 {
+                color: #0ff;
+                margin-bottom: 10px;
+                text-shadow: 0 0 5px #0ff;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+            h2 {
+                font-size: 16px;
+                margin-top: 20px;
+            }
+            h3 {
+                font-size: 14px;
+                margin-top: 15px;
+            }
+
+            .stat {
+                margin: 5px 0;
+                padding: 3px;
+                background: #0a0a0a;
+            }
+
+            .stat-label {
+                color: #0f0;
+            }
+
+            .stat-value {
+                color: #fff;
+                float: right;
+            }
+
+            button {
+                background: #003300;
+                color: #0f0;
+                border: 1px solid #0f0;
+                padding: 8px 15px;
+                margin: 5px 5px 5px 0;
+                cursor: pointer;
+                font-family: 'Courier New', monospace;
+                font-size: 11px;
+                transition: all 0.2s;
+            }
+
+            button:hover {
+                background: #005500;
+                box-shadow: 0 0 10px #0f0;
+            }
+
+            button:disabled {
+                background: #111;
+                color: #333;
+                border-color: #333;
+                cursor: not-allowed;
+            }
+
+            .route-list,
+            .vehicle-list,
+            .goods-list {
+                max-height: 200px;
+                overflow-y: auto;
+                margin: 10px 0;
+                border: 1px solid #0f0;
+                padding: 5px;
+                background: #0a0a0a;
+            }
+
+            .item {
+                padding: 5px;
+                margin: 3px 0;
+                background: #001100;
+                border-left: 3px solid #0f0;
+            }
+
+            .item:hover {
+                background: #002200;
+            }
+
+            .clearfix::after {
+                content: '';
+                display: table;
+                clear: both;
+            }
+
+            #tooltip {
+                position: absolute;
+                background: rgba(0, 50, 0, 0.95);
+                border: 1px solid #0f0;
+                padding: 10px;
+                pointer-events: none;
+                display: none;
+                z-index: 1000;
+                max-width: 250px;
+                font-size: 11px;
+            }
+
+            select {
+                background: #001100;
+                color: #0f0;
+                border: 1px solid #0f0;
+                padding: 5px;
+                font-family: 'Courier New', monospace;
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .profit {
+                color: #0f0;
+            }
+            .loss {
+                color: #f00;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="game-container">
+            <div id="canvas-container">
+                <canvas id="gameCanvas"></canvas>
+                <div id="tooltip"></div>
+            </div>
+            <div id="ui-panel">
+                <h1>🚀 SPACE LOGISTICS TYCOON</h1>
+
+                <div class="stat clearfix">
+                    <span class="stat-label">Credits:</span>
+                    <span class="stat-value" id="credits">10000</span>
+                </div>
+                <div class="stat clearfix">
+                    <span class="stat-label">Daily Income:</span>
+                    <span class="stat-value" id="daily-income">0</span>
+                </div>
+                <div class="stat clearfix">
+                    <span class="stat-label">Day:</span>
+                    <span class="stat-value" id="day">1</span>
+                </div>
+
+                <h2>Selected System</h2>
+                <div id="selected-system">
+                    <p>Click on a star system to select it</p>
+                </div>
+
+                <h2>Actions</h2>
+                <button id="btn-buy-depot" title="Cost: 500 credits">Buy Depot (500cr)</button>
+                <button id="btn-buy-warehouse" title="Cost: 1000 credits">
+                    Buy Warehouse (1000cr)
+                </button>
+                <button id="btn-buy-vehicle" title="Cost: 2000 credits">
+                    Buy Transport (2000cr)
+                </button>
+                <button id="btn-buy-slot" title="Cost: 1500 credits">Buy Port Slot (1500cr)</button>
+
+                <h3>Create Route</h3>
+                <select id="route-from">
+                    <option value="">From System...</option>
+                </select>
+                <select id="route-to">
+                    <option value="">To System...</option>
+                </select>
+                <select id="route-good">
+                    <option value="">Select Good...</option>
+                </select>
+                <select id="route-vehicle">
+                    <option value="">Select Vehicle...</option>
+                </select>
+                <button id="btn-create-route">Create Route</button>
+
+                <h2>Your Assets</h2>
+                <div class="stat clearfix">
+                    <span class="stat-label">Vehicles:</span>
+                    <span class="stat-value" id="vehicle-count">0</span>
+                </div>
+                <div class="stat clearfix">
+                    <span class="stat-label">Depots:</span>
+                    <span class="stat-value" id="depot-count">0</span>
+                </div>
+                <div class="stat clearfix">
+                    <span class="stat-label">Warehouses:</span>
+                    <span class="stat-value" id="warehouse-count">0</span>
+                </div>
+                <div class="stat clearfix">
+                    <span class="stat-label">Active Routes:</span>
+                    <span class="stat-value" id="route-count">0</span>
+                </div>
+
+                <h3>Active Routes</h3>
+                <div class="route-list" id="route-list">
+                    <p style="color: #666">No active routes</p>
+                </div>
+
+                <h3>Your Vehicles</h3>
+                <div class="vehicle-list" id="vehicle-list">
+                    <p style="color: #666">No vehicles</p>
+                </div>
+            </div>
         </div>
-        <div id="ui-panel">
-            <h1>🚀 SPACE LOGISTICS TYCOON</h1>
-            
-            <div class="stat clearfix">
-                <span class="stat-label">Credits:</span>
-                <span class="stat-value" id="credits">10000</span>
-            </div>
-            <div class="stat clearfix">
-                <span class="stat-label">Daily Income:</span>
-                <span class="stat-value" id="daily-income">0</span>
-            </div>
-            <div class="stat clearfix">
-                <span class="stat-label">Day:</span>
-                <span class="stat-value" id="day">1</span>
-            </div>
-            
-            <h2>Selected System</h2>
-            <div id="selected-system">
-                <p>Click on a star system to select it</p>
-            </div>
-            
-            <h2>Actions</h2>
-            <button id="btn-buy-depot" title="Cost: 500 credits">Buy Depot (500cr)</button>
-            <button id="btn-buy-warehouse" title="Cost: 1000 credits">Buy Warehouse (1000cr)</button>
-            <button id="btn-buy-vehicle" title="Cost: 2000 credits">Buy Transport (2000cr)</button>
-            <button id="btn-buy-slot" title="Cost: 1500 credits">Buy Port Slot (1500cr)</button>
-            
-            <h3>Create Route</h3>
-            <select id="route-from">
-                <option value="">From System...</option>
-            </select>
-            <select id="route-to">
-                <option value="">To System...</option>
-            </select>
-            <select id="route-good">
-                <option value="">Select Good...</option>
-            </select>
-            <select id="route-vehicle">
-                <option value="">Select Vehicle...</option>
-            </select>
-            <button id="btn-create-route">Create Route</button>
-            
-            <h2>Your Assets</h2>
-            <div class="stat clearfix">
-                <span class="stat-label">Vehicles:</span>
-                <span class="stat-value" id="vehicle-count">0</span>
-            </div>
-            <div class="stat clearfix">
-                <span class="stat-label">Depots:</span>
-                <span class="stat-value" id="depot-count">0</span>
-            </div>
-            <div class="stat clearfix">
-                <span class="stat-label">Warehouses:</span>
-                <span class="stat-value" id="warehouse-count">0</span>
-            </div>
-            <div class="stat clearfix">
-                <span class="stat-label">Active Routes:</span>
-                <span class="stat-value" id="route-count">0</span>
-            </div>
-            
-            <h3>Active Routes</h3>
-            <div class="route-list" id="route-list">
-                <p style="color: #666;">No active routes</p>
-            </div>
-            
-            <h3>Your Vehicles</h3>
-            <div class="vehicle-list" id="vehicle-list">
-                <p style="color: #666;">No vehicles</p>
-            </div>
-        </div>
-    </div>
-    
-    <script src="game.js"></script>
-</body>
+
+        <script src="game.js"></script>
+    </body>
 </html>

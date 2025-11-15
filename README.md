@@ -17,26 +17,30 @@ Space Logistics Tycoon is a strategic management game where you build and operat
 ### Game Mechanics
 
 #### Star Systems
+
 - **100 interconnected star systems** connected via hyperlanes
 - Each system has:
-  - Population (affects demand)
-  - Exports (goods you can buy cheap)
-  - Imports (goods you can sell expensive)
-  - Available port slots for docking
+    - Population (affects demand)
+    - Exports (goods you can buy cheap)
+    - Imports (goods you can sell expensive)
+    - Available port slots for docking
 
 #### Infrastructure
+
 - **Depots (500cr)**: Required to establish trade routes in a system
 - **Warehouses (1000cr)**: Increase route profitability by 10% per warehouse
 - **Port Slots (1500cr)**: Expand docking capacity at hyperspace ports
 
 #### Vehicles
+
 - **Transports (2000cr)**: Ships that move goods between systems
 - Each vehicle has:
-  - Capacity: 100 units
-  - Speed: Determines how fast routes complete
-  - Must be assigned to a route to generate income
+    - Capacity: 100 units
+    - Speed: Determines how fast routes complete
+    - Must be assigned to a route to generate income
 
 #### Goods Types
+
 - Electronics (High value)
 - Minerals (Medium value)
 - Food (Low value)
@@ -45,6 +49,7 @@ Space Logistics Tycoon is a strategic management game where you build and operat
 - Luxury Goods (Premium value)
 
 #### Creating Trade Routes
+
 1. Buy depots in both origin and destination systems
 2. Buy at least one vehicle
 3. Select origin system (must export the desired good)
@@ -74,9 +79,56 @@ Space Logistics Tycoon is a strategic management game where you build and operat
 - Active routes generate income when vehicles complete deliveries
 - Income is calculated based on: (Sell Price - Buy Price) × Cargo × (1 + Warehouse Bonuses)
 
+## Development Setup
+
+### Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Run linting
+npm run lint
+
+# Check code formatting
+npm run format:check
+
+# Auto-fix formatting
+npm run format
+
+# Run all validation checks
+npm test
+```
+
+### CI/CD
+
+This project uses GitHub Actions for continuous integration:
+
+- **Linting**: ESLint checks code quality
+- **Formatting**: Prettier ensures consistent code style
+- **HTML Validation**: Checks for valid HTML structure
+- **Load Testing**: Verifies game files load correctly
+
+See `.github/workflows/ci.yml` for the complete CI configuration.
+
+### GitHub Copilot Agents
+
+This repository is configured for GitHub Copilot Agents. See `.github/agents/README.md` for:
+
+- Available agent capabilities
+- How to use agents in development
+- Custom agent configuration
+
+### Code Standards
+
+- **JavaScript**: ES2021 with browser environment
+- **Formatting**: 4 spaces, single quotes, 100 char line width
+- **Linting**: ESLint with recommended rules
+- All changes must pass CI checks before merging
+
 ## Technical Details
 
-- Pure HTML5/CSS3/JavaScript - no external dependencies
+- Pure HTML5/CSS3/JavaScript - no external dependencies for runtime
 - Canvas-based 2D rendering
 - Procedurally generated star system network
 - Dynamic economy simulation
@@ -92,11 +144,12 @@ Space Logistics Tycoon is a strategic management game where you build and operat
 ✅ Dynamic trade route creation  
 ✅ Real-time profit calculation  
 ✅ Pan and zoom camera controls  
-✅ Economic simulation with supply/demand  
+✅ Economic simulation with supply/demand
 
 ## Future Enhancements
 
 Potential features for expansion:
+
 - Random events (piracy, demand spikes, disasters)
 - Different vehicle types (fast couriers, bulk freighters)
 - Technology upgrades

@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, copilot/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-format:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run ESLint
+      run: npm run lint
+    
+    - name: Check code formatting
+      run: npm run format:check
+    
+    - name: Validate game files
+      run: |
+        echo "Checking if all required files exist..."
+        test -f index.html || exit 1
+        test -f game.js || exit 1
+        test -f README.md || exit 1
+        test -f GAME_MANUAL.md || exit 1
+        echo "All required files present ✓"
+
+  validate-html:
+    name: Validate HTML
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Validate HTML syntax
+      run: |
+        echo "Checking HTML structure..."
+        grep -q "<!DOCTYPE html>" index.html || exit 1
+        grep -q "<canvas" index.html || exit 1
+        grep -q "game.js" index.html || exit 1
+        echo "HTML structure valid ✓"
+
+  test-game-loads:
+    name: Test Game Loading
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Start local server and test
+      run: |
+        # Start server in background
+        npx http-server -p 8080 &
+        SERVER_PID=$!
+        
+        # Wait for server to start
+        sleep 3
+        
+        # Check if index.html loads
+        curl -f http://localhost:8080/index.html > /dev/null || exit 1
+        
+        # Check if game.js loads
+        curl -f http://localhost:8080/game.js > /dev/null || exit 1
+        
+        # Kill server
+        kill $SERVER_PID
+        
+        echo "Game files load successfully ✓"
