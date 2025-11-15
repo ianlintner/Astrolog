@@ -67,8 +67,8 @@ jobs:
     
     - name: Start local server and test
       run: |
-        # Start server in background
-        npx http-server -p 8080 &
+        # Start Python HTTP server in background
+        python3 -m http.server 8080 &
         SERVER_PID=$!
         
         # Wait for server to start
