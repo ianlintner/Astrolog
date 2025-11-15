@@ -48,7 +48,7 @@ jobs:
     - name: Validate HTML syntax
       run: |
         echo "Checking HTML structure..."
-        grep -q "<!DOCTYPE html>" index.html || exit 1
+        grep -iq "<!doctype html>" index.html || exit 1
         grep -q "<canvas" index.html || exit 1
         grep -q "game.js" index.html || exit 1
         echo "HTML structure valid ✓"
