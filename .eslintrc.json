@@ -1,0 +1,19 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": ["eslint:recommended", "prettier"],
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "script"
+    },
+    "rules": {
+        "no-unused-vars": "warn",
+        "no-console": "off",
+        "no-alert": "off",
+        "prefer-const": "warn",
+        "no-var": "warn",
+        "no-redeclare": "off"
+    }
+}

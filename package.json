@@ -1,0 +1,36 @@
+{
+    "name": "space-logistics-tycoon",
+    "version": "1.0.0",
+    "description": "A browser-based space logistics management game",
+    "main": "game.js",
+    "scripts": {
+        "lint": "eslint *.js",
+        "lint:fix": "eslint *.js --fix",
+        "format": "prettier --write \"*.{js,html,md,json}\"",
+        "format:check": "prettier --check \"*.{js,html,md,json}\"",
+        "test": "echo 'Running validation checks...' && npm run lint && npm run format:check",
+        "validate": "npm run test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ianlintner/Astrolog.git"
+    },
+    "keywords": [
+        "game",
+        "logistics",
+        "space",
+        "management",
+        "simulation"
+    ],
+    "author": "",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ianlintner/Astrolog/issues"
+    },
+    "homepage": "https://github.com/ianlintner/Astrolog#readme",
+    "devDependencies": {
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "prettier": "^3.2.5"
+    }
+}
