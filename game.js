@@ -1,4 +1,13 @@
-// Space Logistics Tycoon - Game Engine
+// ====================================================================
+// DEPRECATED: This file is kept for reference only
+// ====================================================================
+// The game has been modularized into separate ES6 modules.
+// Please see src/game.js and src/modules/ for the current implementation.
+// This file is no longer used by index.html.
+// See ARCHITECTURE.md for details on the new module structure.
+// ====================================================================
+
+// Space Logistics Tycoon - Game Engine (LEGACY)
 // A space-themed logistics management game
 
 class Game {

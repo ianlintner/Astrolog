@@ -4,10 +4,10 @@
     "description": "A browser-based space logistics management game",
     "main": "game.js",
     "scripts": {
-        "lint": "eslint *.js",
-        "lint:fix": "eslint *.js --fix",
-        "format": "prettier --write \"*.{js,html,md,json}\"",
-        "format:check": "prettier --check \"*.{js,html,md,json}\"",
+        "lint": "eslint src/**/*.js",
+        "lint:fix": "eslint src/**/*.js --fix",
+        "format": "prettier --write \"*.{js,html,md,json}\" \"src/**/*.js\"",
+        "format:check": "prettier --check \"*.{js,html,md,json}\" \"src/**/*.js\"",
         "test": "echo 'Running validation checks...' && npm run lint && npm run format:check",
         "validate": "npm run test"
     },
