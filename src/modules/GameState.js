@@ -6,6 +6,7 @@ export class GameState {
         this.depots = {}; // systemId -> count
         this.warehouses = {}; // systemId -> count
         this.portSlots = {}; // systemId -> slots (start with 2)
+        this.tradeRights = []; // Exclusive trade rights owned by player
 
         this.goodsTypes = [
             { id: 'electronics', name: 'Electronics', basePrice: 100, color: '#00f' },
@@ -77,5 +78,34 @@ export class GameState {
 
     getGoodByName(goodId) {
         return this.goodsTypes.find((g) => g.id === goodId);
+    }
+
+    // Trade rights management
+    addTradeRight(from, to, good, routeId) {
+        this.tradeRights.push({ from, to, good, routeId });
+    }
+
+    removeTradeRight(routeId) {
+        this.tradeRights = this.tradeRights.filter((tr) => tr.routeId !== routeId);
+    }
+
+    hasTradeRight(from, to, good) {
+        return this.tradeRights.some((tr) => tr.from === from && tr.to === to && tr.good === good);
+    }
+
+    getTradeRightsMaintenance() {
+        return this.tradeRights.length * 100; // 100cr per trade right per day
+    }
+
+    maintainTradeRights() {
+        const cost = this.getTradeRightsMaintenance();
+        if (this.credits >= cost) {
+            this.credits -= cost;
+            return true;
+        }
+        // Can't afford - lose some rights
+        const rightsToLose = Math.ceil((cost - this.credits) / 100);
+        this.tradeRights.splice(0, rightsToLose);
+        return false;
     }
 }

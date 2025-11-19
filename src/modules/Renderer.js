@@ -1,12 +1,20 @@
 // Renderer.js - Canvas rendering engine
 export class Renderer {
-    constructor(canvas, starSystemManager, gameState, vehicleManager, routeManager) {
+    constructor(
+        canvas,
+        starSystemManager,
+        gameState,
+        vehicleManager,
+        routeManager,
+        aiCompetitorManager
+    ) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.starSystemManager = starSystemManager;
         this.gameState = gameState;
         this.vehicleManager = vehicleManager;
         this.routeManager = routeManager;
+        this.aiCompetitorManager = aiCompetitorManager;
 
         this.camera = {
             x: 0,
@@ -75,6 +83,7 @@ export class Renderer {
 
         this.renderHyperLanes(ctx);
         this.renderActiveRoutes(ctx);
+        this.renderAIRoutes(ctx);
         this.renderStarSystems(ctx);
 
         ctx.restore();
@@ -133,6 +142,58 @@ export class Renderer {
                 ctx.arc(vx, vy, 4, 0, Math.PI * 2);
                 ctx.fill();
             }
+        });
+    }
+
+    renderAIRoutes(ctx) {
+        if (!this.aiCompetitorManager) return;
+
+        const aiPlayers = this.aiCompetitorManager.getAllAIPlayers();
+        const colors = ['#f80', '#f0f']; // Different colors for each AI
+
+        aiPlayers.forEach((aiPlayer, aiIndex) => {
+            const color = colors[aiIndex % colors.length];
+
+            aiPlayer.routes.forEach((route) => {
+                if (route.active) {
+                    const vehicle = aiPlayer.vehicles.find((v) => v.id === route.vehicleId);
+                    if (!vehicle) return;
+
+                    // Draw route path (dashed line for AI routes)
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+
+                    for (let i = 0; i < route.path.length - 1; i++) {
+                        const sys1 = this.starSystemManager.starSystems[route.path[i]];
+                        const sys2 = this.starSystemManager.starSystems[route.path[i + 1]];
+
+                        if (i === 0) {
+                            ctx.moveTo(sys1.x, sys1.y);
+                        }
+                        ctx.lineTo(sys2.x, sys2.y);
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Draw AI vehicle
+                    const pathIndex = Math.floor(vehicle.position * (route.path.length - 1));
+                    const nextIndex = Math.min(pathIndex + 1, route.path.length - 1);
+                    const t = vehicle.position * (route.path.length - 1) - pathIndex;
+
+                    const sys1 = this.starSystemManager.starSystems[route.path[pathIndex]];
+                    const sys2 = this.starSystemManager.starSystems[route.path[nextIndex]];
+
+                    const vx = sys1.x + (sys2.x - sys1.x) * t;
+                    const vy = sys1.y + (sys2.y - sys1.y) * t;
+
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(vx, vy, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
         });
     }
 

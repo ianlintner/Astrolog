@@ -52,6 +52,7 @@ export class RouteManager {
             sellPrice: importGood.price,
             profit: profit,
             active: true,
+            hasExclusiveRights: false,
         };
 
         this.routes.push(route);
@@ -104,5 +105,49 @@ export class RouteManager {
             }
         });
         return Math.floor(dailyIncome);
+    }
+
+    // Purchase exclusive trade rights for a route
+    purchaseExclusiveRights(routeId) {
+        const route = this.routes[routeId];
+        if (!route) {
+            return { success: false, error: 'Route not found' };
+        }
+
+        if (route.hasExclusiveRights) {
+            return { success: false, error: 'Route already has exclusive rights' };
+        }
+
+        const cost = 5000; // Base cost for exclusive rights
+        if (!this.gameState.spend(cost)) {
+            return { success: false, error: 'Not enough credits' };
+        }
+
+        route.hasExclusiveRights = true;
+        this.gameState.addTradeRight(route.from, route.to, route.good, route.id);
+
+        return { success: true };
+    }
+
+    // Check if a route conflicts with existing exclusive rights
+    isRouteBlocked(fromId, toId, goodId, aiCompetitorManager) {
+        // Check if player has exclusive rights
+        if (this.gameState.hasTradeRight(fromId, toId, goodId)) {
+            return false; // Player owns it, not blocked
+        }
+
+        // Check if any AI has exclusive rights
+        if (aiCompetitorManager) {
+            for (const aiPlayer of aiCompetitorManager.getAllAIPlayers()) {
+                const hasRight = aiPlayer.tradeRights.some(
+                    (tr) => tr.from === fromId && tr.to === toId && tr.good === goodId
+                );
+                if (hasRight) {
+                    return true; // Blocked by AI
+                }
+            }
+        }
+
+        return false;
     }
 }

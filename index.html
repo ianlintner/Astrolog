@@ -212,6 +212,16 @@
                 </select>
                 <button id="btn-create-route">Create Route</button>
 
+                <h3>Trade Rights Management</h3>
+                <p style="font-size: 10px; color: #888; margin-bottom: 5px">
+                    Purchase exclusive rights to prevent AI competitors from using a route. Costs
+                    5000cr upfront + 100cr/day maintenance.
+                </p>
+                <select id="exclusive-route">
+                    <option value="">Select Your Route...</option>
+                </select>
+                <button id="btn-buy-exclusive">Buy Exclusive Rights (5000cr)</button>
+
                 <h2>Your Assets</h2>
                 <div class="stat clearfix">
                     <span class="stat-label">Vehicles:</span>
@@ -229,6 +239,14 @@
                     <span class="stat-label">Active Routes:</span>
                     <span class="stat-value" id="route-count">0</span>
                 </div>
+                <div class="stat clearfix">
+                    <span class="stat-label">Trade Rights:</span>
+                    <span class="stat-value" id="trade-rights-count">0</span>
+                </div>
+                <div class="stat clearfix">
+                    <span class="stat-label">Maintenance Cost:</span>
+                    <span class="stat-value" id="maintenance-cost">0</span>
+                </div>
 
                 <h3>Active Routes</h3>
                 <div class="route-list" id="route-list">
@@ -238,6 +256,11 @@
                 <h3>Your Vehicles</h3>
                 <div class="vehicle-list" id="vehicle-list">
                     <p style="color: #666">No vehicles</p>
+                </div>
+
+                <h2>AI Competitors</h2>
+                <div id="ai-competitors">
+                    <p style="color: #666">Loading...</p>
                 </div>
             </div>
         </div>
