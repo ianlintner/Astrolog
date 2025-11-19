@@ -294,12 +294,12 @@ export class UIManager {
     }
 
     buyExclusiveRights() {
-        const routeId = parseInt(document.getElementById('exclusive-route').value);
-
-        if (isNaN(routeId)) {
+        const routeIdStr = document.getElementById('exclusive-route').value;
+        if (!routeIdStr) {
             alert('Please select a route');
             return;
         }
+        const routeId = parseInt(routeIdStr);
 
         const result = this.routeManager.purchaseExclusiveRights(routeId);
 

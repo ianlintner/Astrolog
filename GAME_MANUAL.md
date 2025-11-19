@@ -256,7 +256,7 @@ Trade rights give you exclusive access to a specific trade route (from-to-good c
 #### Maintenance
 
 - Costs are automatically deducted each day
-- If you can't afford maintenance, you lose some trade rights
+- If you can't afford maintenance, you lose some trade rights (oldest first)
 - Monitor your "Maintenance Cost" stat to plan finances
 
 ### Competing Strategy Tips

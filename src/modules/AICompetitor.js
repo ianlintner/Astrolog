@@ -140,6 +140,7 @@ export class AICompetitorManager {
 
     findProfitableSystems() {
         // Returns system IDs sorted by profitability
+        // Note: O(n²) complexity is acceptable for the expected game scale (100 systems)
         const systems = this.starSystemManager.starSystems;
         const scores = systems.map((sys) => {
             let score = 0;
@@ -177,6 +178,11 @@ export class AICompetitorManager {
                 fromSystem.exports.forEach((exp) => {
                     const imp = toSystem.imports.find((i) => i.id === exp.id);
                     if (imp) {
+                        // Check if route is blocked by exclusive trade rights
+                        if (this.routeManager.isRouteBlocked(fromId, toId, exp.id, this)) {
+                            return; // Skip this route, it's blocked
+                        }
+
                         const profit = imp.price - exp.price;
                         if (profit > bestProfit) {
                             bestProfit = profit;
@@ -204,9 +210,14 @@ export class AICompetitorManager {
         if (aiPlayer.credits >= maintenanceCost) {
             aiPlayer.credits -= maintenanceCost;
         } else {
-            // Can't afford maintenance - lose some trade rights
+            // Can't afford maintenance - lose some trade rights (oldest first)
             const rightsToLose = Math.ceil((maintenanceCost - aiPlayer.credits) / 100);
-            aiPlayer.tradeRights.splice(0, rightsToLose);
+            const lostRights = aiPlayer.tradeRights.splice(0, rightsToLose);
+            // Update routes that lost their exclusive status
+            lostRights.forEach((right) => {
+                const route = aiPlayer.routes.find((r) => r.id === right.routeId);
+                if (route) route.hasExclusiveRights = false;
+            });
         }
     }
 

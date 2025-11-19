@@ -97,15 +97,25 @@ export class GameState {
         return this.tradeRights.length * 100; // 100cr per trade right per day
     }
 
-    maintainTradeRights() {
+    maintainTradeRights(routeManager) {
         const cost = this.getTradeRightsMaintenance();
         if (this.credits >= cost) {
             this.credits -= cost;
             return true;
         }
-        // Can't afford - lose some rights
+        // Can't afford - lose some rights (oldest first)
         const rightsToLose = Math.ceil((cost - this.credits) / 100);
-        this.tradeRights.splice(0, rightsToLose);
+        const lostRights = this.tradeRights.splice(0, rightsToLose);
+
+        // Update routes that lost their exclusive status
+        if (routeManager) {
+            lostRights.forEach((right) => {
+                const route = routeManager.routes.find((r) => r.id === right.routeId);
+                if (route) {
+                    route.hasExclusiveRights = false;
+                }
+            });
+        }
         return false;
     }
 }

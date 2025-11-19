@@ -97,7 +97,7 @@ class Game {
         this.gameState.advanceDay();
 
         // Player maintains trade rights
-        this.gameState.maintainTradeRights();
+        this.gameState.maintainTradeRights(this.routeManager);
 
         // Process player routes
         this.routeManager.processRoutes();

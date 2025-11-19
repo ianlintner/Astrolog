@@ -178,6 +178,8 @@ export class Renderer {
                     ctx.setLineDash([]);
 
                     // Draw AI vehicle
+                    if (!route.path || route.path.length < 2) return;
+
                     const pathIndex = Math.floor(vehicle.position * (route.path.length - 1));
                     const nextIndex = Math.min(pathIndex + 1, route.path.length - 1);
                     const t = vehicle.position * (route.path.length - 1) - pathIndex;

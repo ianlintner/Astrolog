@@ -109,7 +109,7 @@ export class RouteManager {
 
     // Purchase exclusive trade rights for a route
     purchaseExclusiveRights(routeId) {
-        const route = this.routes[routeId];
+        const route = this.routes.find((r) => r.id === routeId);
         if (!route) {
             return { success: false, error: 'Route not found' };
         }
