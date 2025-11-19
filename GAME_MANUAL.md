@@ -202,6 +202,71 @@ Daily Income = Income per Trip × Trips per Day × (1 + Warehouse Bonus)
 - Each system only imports specific goods
 - Check "Imports (Sell)" section for what they want
 
+## AI Competitors
+
+### Overview
+
+You now compete against two AI-controlled corporations:
+
+- **StarCorp Industries** (Medium difficulty)
+- **Galactic Express** (Easy difficulty)
+
+### AI Behavior
+
+AI competitors will:
+
+- Build depots in profitable star systems
+- Purchase warehouses to increase route profitability
+- Buy transport vehicles
+- Create trade routes between systems
+- Acquire exclusive trade rights for competitive advantage
+- Earn credits from successful trade routes
+
+### AI Visualization
+
+- **Orange dashed lines**: StarCorp Industries routes
+- **Magenta dashed lines**: Galactic Express routes
+- **Colored dots**: AI vehicles in transit
+- AI stats displayed in the "AI Competitors" panel
+
+### Exclusive Trade Rights
+
+#### What Are Trade Rights?
+
+Trade rights give you exclusive access to a specific trade route (from-to-good combination), preventing AI competitors from using the same route.
+
+#### Cost
+
+- **Upfront**: 5000 credits
+- **Maintenance**: 100 credits per day per trade right
+
+#### How to Purchase
+
+1. Create an active trade route
+2. Go to "Trade Rights Management" section
+3. Select your route from the dropdown
+4. Click "Buy Exclusive Rights (5000cr)"
+
+#### Benefits
+
+- Locks AI out of that specific route
+- Protects your most profitable routes
+- Strategic advantage in competitive markets
+
+#### Maintenance
+
+- Costs are automatically deducted each day
+- If you can't afford maintenance, you lose some trade rights
+- Monitor your "Maintenance Cost" stat to plan finances
+
+### Competing Strategy Tips
+
+1. **Secure Profitable Routes Early**: Buy exclusive rights for high-profit routes before AI does
+2. **Monitor AI Expansion**: Watch the AI Competitors panel to see where they're investing
+3. **Balance Costs**: Trade rights are expensive - only protect your best routes
+4. **Maintain Cash Reserve**: Keep enough credits to pay daily maintenance costs
+5. **Expand Aggressively**: AI acts every 3 days, so stay ahead by building faster
+
 ## Future Expansion Ideas
 
 The game framework supports adding:
@@ -209,7 +274,7 @@ The game framework supports adding:
 - Random events (piracy, demand spikes)
 - Technology upgrades
 - Different vehicle types
-- Competing AI traders
+- ~~Competing AI traders~~ ✅ **ADDED**
 - Save/load functionality
 - Missions and objectives
 - Stock market mechanics
