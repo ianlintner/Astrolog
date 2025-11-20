@@ -58,6 +58,15 @@ Space Logistics Tycoon is a strategic management game where you build and operat
 6. Assign a vehicle
 7. Route activates automatically and generates profit
 
+#### AI Competitors
+
+Two AI corporations compete with you for trade dominance:
+
+- **StarCorp Industries** and **Galactic Express**
+- AI builds depots, buys vehicles, and creates trade routes
+- AI routes shown as dashed lines on the map
+- Purchase **exclusive trade rights** (5000cr + 100cr/day) to lock AI out of your best routes
+
 ### Strategy Tips
 
 1. **Find Profitable Routes**: Look for goods with high price differences between systems
@@ -144,7 +153,9 @@ This repository is configured for GitHub Copilot Agents. See `.github/agents/REA
 ✅ Dynamic trade route creation  
 ✅ Real-time profit calculation  
 ✅ Pan and zoom camera controls  
-✅ Economic simulation with supply/demand
+✅ Economic simulation with supply/demand  
+✅ **AI competitors with intelligent decision-making**  
+✅ **Exclusive trade rights system with maintenance costs**
 
 ## Future Enhancements
 
@@ -153,7 +164,7 @@ Potential features for expansion:
 - Random events (piracy, demand spikes, disasters)
 - Different vehicle types (fast couriers, bulk freighters)
 - Technology upgrades
-- Competing AI factions
+- ~~Competing AI factions~~ ✅ **IMPLEMENTED**
 - Save/load game state
 - Mission system
 - Stock market for goods

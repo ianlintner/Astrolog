@@ -6,6 +6,7 @@ import { RouteManager } from './modules/Route.js';
 import { Renderer } from './modules/Renderer.js';
 import { InputHandler } from './modules/InputHandler.js';
 import { UIManager } from './modules/UIManager.js';
+import { AICompetitorManager } from './modules/AICompetitor.js';
 
 class Game {
     constructor() {
@@ -25,6 +26,18 @@ class Game {
             this.vehicleManager
         );
 
+        // Initialize AI competitor manager
+        this.aiCompetitorManager = new AICompetitorManager(
+            this.gameState,
+            this.starSystemManager,
+            this.vehicleManager,
+            this.routeManager
+        );
+
+        // Create AI competitors
+        this.aiCompetitorManager.createAIPlayer('StarCorp Industries', 'medium');
+        this.aiCompetitorManager.createAIPlayer('Galactic Express', 'easy');
+
         // Generate game world
         this.starSystemManager.generateStarSystems();
         this.starSystemManager.generateHyperLanes();
@@ -36,7 +49,8 @@ class Game {
             this.starSystemManager,
             this.gameState,
             this.vehicleManager,
-            this.routeManager
+            this.routeManager,
+            this.aiCompetitorManager
         );
 
         // Center camera
@@ -48,7 +62,8 @@ class Game {
             this.gameState,
             this.starSystemManager,
             this.vehicleManager,
-            this.routeManager
+            this.routeManager,
+            this.aiCompetitorManager
         );
 
         // Initialize input handler
@@ -80,7 +95,25 @@ class Game {
 
     advanceDay() {
         this.gameState.advanceDay();
+
+        // Player maintains trade rights
+        this.gameState.maintainTradeRights(this.routeManager);
+
+        // Process player routes
         this.routeManager.processRoutes();
+
+        // Process AI turns
+        const aiPlayers = this.aiCompetitorManager.getAllAIPlayers();
+        aiPlayers.forEach((aiPlayer) => {
+            // AI processes routes to earn income
+            this.aiCompetitorManager.processAIRoutes(aiPlayer);
+
+            // AI takes actions (every 3 days to reduce frequency)
+            if (this.gameState.day % 3 === 0) {
+                this.aiCompetitorManager.processAITurn(aiPlayer);
+            }
+        });
+
         this.uiManager.updateStats();
     }
 

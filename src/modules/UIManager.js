@@ -1,10 +1,11 @@
 // UIManager.js - UI panel management
 export class UIManager {
-    constructor(gameState, starSystemManager, vehicleManager, routeManager) {
+    constructor(gameState, starSystemManager, vehicleManager, routeManager, aiCompetitorManager) {
         this.gameState = gameState;
         this.starSystemManager = starSystemManager;
         this.vehicleManager = vehicleManager;
         this.routeManager = routeManager;
+        this.aiCompetitorManager = aiCompetitorManager;
 
         this.selectedSystem = null;
         this.tooltip = document.getElementById('tooltip');
@@ -24,6 +25,9 @@ export class UIManager {
         document
             .getElementById('btn-create-route')
             .addEventListener('click', () => this.createRoute());
+        document
+            .getElementById('btn-buy-exclusive')
+            .addEventListener('click', () => this.buyExclusiveRights());
     }
 
     setSelectedSystem(system) {
@@ -124,12 +128,19 @@ export class UIManager {
             this.routeManager.getActiveRoutes().length;
         document.getElementById('daily-income').textContent =
             this.routeManager.calculateDailyIncome();
+        document.getElementById('trade-rights-count').textContent =
+            this.gameState.tradeRights.length;
+        document.getElementById('maintenance-cost').textContent =
+            this.gameState.getTradeRightsMaintenance();
 
         const vehicleSelect = document.getElementById('route-vehicle');
         vehicleSelect.innerHTML = '<option value="">Select Vehicle...</option>';
         this.vehicleManager.getAvailableVehicles().forEach((v) => {
             vehicleSelect.innerHTML += `<option value="${v.id}">${v.name}</option>`;
         });
+
+        this.updateExclusiveRouteSelector();
+        this.updateAICompetitors();
     }
 
     updateSelectedSystemUI() {
@@ -218,12 +229,16 @@ export class UIManager {
             const good = this.gameState.getGoodByName(route.good);
             const vehicle = this.vehicleManager.getVehicle(route.vehicleId);
             const profitClass = route.profit > 0 ? 'profit' : 'loss';
+            const exclusiveBadge = route.hasExclusiveRights
+                ? '<span style="color: #ff0;">🔒 Exclusive</span><br>'
+                : '';
 
             html += `
                 <div class="item">
                     <strong>${vehicle.name}</strong><br>
                     ${fromSystem.name} → ${toSystem.name}<br>
                     ${good.name}<br>
+                    ${exclusiveBadge}
                     <span class="${profitClass}">Profit: ${route.profit}cr/unit</span>
                 </div>
             `;
@@ -276,5 +291,74 @@ export class UIManager {
 
     hideTooltip() {
         this.tooltip.style.display = 'none';
+    }
+
+    buyExclusiveRights() {
+        const routeIdStr = document.getElementById('exclusive-route').value;
+        if (!routeIdStr) {
+            alert('Please select a route');
+            return;
+        }
+        const routeId = parseInt(routeIdStr);
+
+        const result = this.routeManager.purchaseExclusiveRights(routeId);
+
+        if (!result.success) {
+            alert(result.error);
+            return;
+        }
+
+        alert('Exclusive trade rights purchased! This route is now protected from AI competition.');
+        this.updateAll();
+    }
+
+    updateExclusiveRouteSelector() {
+        const select = document.getElementById('exclusive-route');
+        select.innerHTML = '<option value="">Select Your Route...</option>';
+
+        const routes = this.routeManager.getActiveRoutes();
+        routes.forEach((route) => {
+            if (!route.hasExclusiveRights) {
+                const fromSystem = this.starSystemManager.getSystem(route.from);
+                const toSystem = this.starSystemManager.getSystem(route.to);
+                const good = this.gameState.getGoodByName(route.good);
+                select.innerHTML += `<option value="${route.id}">${fromSystem.name} → ${toSystem.name} (${good.name})</option>`;
+            }
+        });
+    }
+
+    updateAICompetitors() {
+        const container = document.getElementById('ai-competitors');
+        if (!this.aiCompetitorManager) {
+            container.innerHTML = '<p style="color: #666;">No AI competitors</p>';
+            return;
+        }
+
+        const aiPlayers = this.aiCompetitorManager.getAllAIPlayers();
+        if (aiPlayers.length === 0) {
+            container.innerHTML = '<p style="color: #666;">No AI competitors</p>';
+            return;
+        }
+
+        let html = '';
+        aiPlayers.forEach((ai) => {
+            const depots = this.aiCompetitorManager.getAIDepotCount(ai);
+            const warehouses = this.aiCompetitorManager.getAIWarehouseCount(ai);
+            const routes = this.aiCompetitorManager.getAIActiveRoutesCount(ai);
+
+            html += `
+                <div class="item">
+                    <strong>${ai.name}</strong><br>
+                    Credits: ${Math.floor(ai.credits)}cr<br>
+                    Vehicles: ${ai.vehicles.length}<br>
+                    Depots: ${depots}<br>
+                    Warehouses: ${warehouses}<br>
+                    Routes: ${routes}<br>
+                    Trade Rights: ${ai.tradeRights.length}
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
     }
 }
