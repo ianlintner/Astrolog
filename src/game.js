@@ -7,6 +7,7 @@ import { Renderer } from './modules/Renderer.js';
 import { InputHandler } from './modules/InputHandler.js';
 import { UIManager } from './modules/UIManager.js';
 import { AICompetitorManager } from './modules/AICompetitor.js';
+import { SaveManager } from './modules/SaveManager.js';
 
 class Game {
     constructor() {
@@ -15,6 +16,9 @@ class Game {
         // Resize canvas to fit container
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
+
+        // Initialize save manager
+        this.saveManager = new SaveManager();
 
         // Initialize modules
         this.gameState = new GameState();
@@ -34,14 +38,13 @@ class Game {
             this.routeManager
         );
 
-        // Create AI competitors
-        this.aiCompetitorManager.createAIPlayer('StarCorp Industries', 'medium');
-        this.aiCompetitorManager.createAIPlayer('Galactic Express', 'easy');
-
-        // Generate game world
-        const center = this.starSystemManager.generateStarSystems();
-        this.starSystemManager.generateHyperLanes();
-        this.starSystemManager.assignSystemEconomies();
+        // Try to load saved game, otherwise start new game
+        const savedGame = this.saveManager.loadGame();
+        if (savedGame) {
+            this.loadSavedGame(savedGame);
+        } else {
+            this.startNewGame();
+        }
 
         // Initialize renderer
         this.renderer = new Renderer(
@@ -53,8 +56,10 @@ class Game {
             this.aiCompetitorManager
         );
 
-        // Center camera
-        this.renderer.centerCamera(center.centerX, center.centerY);
+        // Center camera on the star field
+        const gridSize = 10;
+        const cellSize = 150;
+        this.renderer.centerCamera((gridSize * cellSize) / 2, (gridSize * cellSize) / 2);
 
         // Initialize UI manager
         this.uiManager = new UIManager(
@@ -65,13 +70,23 @@ class Game {
             this.aiCompetitorManager
         );
 
+        // Pass save/reset functions to UI manager
+        this.uiManager.setSaveManager(
+            this.saveManager,
+            () => this.saveGame(),
+            () => this.resetGame()
+        );
+
         // Initialize input handler
         this.inputHandler = new InputHandler(this.canvas, this.renderer, (system) =>
             this.onSystemSelect(system)
         );
 
-        // Set up initial player infrastructure
-        this.setupInitialPlayerState();
+        // Select initial system if this is a new game
+        if (this.initialStartingSystem) {
+            this.renderer.setSelectedSystem(this.initialStartingSystem);
+            this.uiManager.setSelectedSystem(this.initialStartingSystem);
+        }
 
         // Initial UI update
         this.uiManager.updateAll();
@@ -82,6 +97,49 @@ class Game {
 
         // Start day cycle (every 5 seconds = 1 day)
         this.dayCycleInterval = setInterval(() => this.advanceDay(), 5000);
+
+        // Auto-save every 30 seconds
+        this.autoSaveInterval = setInterval(() => this.saveGame(), 30000);
+    }
+
+    startNewGame() {
+        // Create AI competitors
+        this.aiCompetitorManager.createAIPlayer('StarCorp Industries', 'medium');
+        this.aiCompetitorManager.createAIPlayer('Galactic Express', 'easy');
+
+        // Generate game world
+        this.starSystemManager.generateStarSystems();
+        this.starSystemManager.generateHyperLanes();
+        this.starSystemManager.assignSystemEconomies();
+
+        // Set up initial player infrastructure
+        this.setupInitialPlayerState();
+    }
+
+    loadSavedGame(savedGame) {
+        // Restore all game state from saved data
+        this.saveManager.restoreGameState(this.gameState, savedGame.gameState);
+        this.saveManager.restoreStarSystems(this.starSystemManager, savedGame.starSystems);
+        this.saveManager.restoreVehicles(this.vehicleManager, savedGame.vehicles);
+        this.saveManager.restoreRoutes(this.routeManager, savedGame.routes);
+        this.saveManager.restoreAIPlayers(this.aiCompetitorManager, savedGame.aiPlayers);
+    }
+
+    saveGame() {
+        return this.saveManager.saveGame(
+            this.gameState,
+            this.starSystemManager,
+            this.vehicleManager,
+            this.routeManager,
+            this.aiCompetitorManager
+        );
+    }
+
+    resetGame() {
+        // Delete saved game
+        this.saveManager.deleteSave();
+        // Reload the page to start fresh
+        window.location.reload();
     }
 
     resizeCanvas() {
@@ -213,9 +271,8 @@ class Game {
             vehicle1.id
         );
 
-        // Select the first system so the player can see their starting position
-        this.renderer.setSelectedSystem(startRoute.from);
-        this.uiManager.setSelectedSystem(startRoute.from);
+        // Store starting system to select after renderer is ready
+        this.initialStartingSystem = startRoute.from;
 
         // Note: The initial infrastructure is a starter bonus - costs are not deducted
         // Cost reference: Depots = 500cr each, Vehicles = 2000cr each (defined in UIManager.js)
