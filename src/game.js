@@ -39,7 +39,7 @@ class Game {
         this.aiCompetitorManager.createAIPlayer('Galactic Express', 'easy');
 
         // Generate game world
-        this.starSystemManager.generateStarSystems();
+        const center = this.starSystemManager.generateStarSystems();
         this.starSystemManager.generateHyperLanes();
         this.starSystemManager.assignSystemEconomies();
 
@@ -54,7 +54,6 @@ class Game {
         );
 
         // Center camera
-        const center = this.starSystemManager.generateStarSystems();
         this.renderer.centerCamera(center.centerX, center.centerY);
 
         // Initialize UI manager
@@ -70,6 +69,9 @@ class Game {
         this.inputHandler = new InputHandler(this.canvas, this.renderer, (system) =>
             this.onSystemSelect(system)
         );
+
+        // Set up initial player infrastructure
+        this.setupInitialPlayerState();
 
         // Initial UI update
         this.uiManager.updateAll();
@@ -126,6 +128,75 @@ class Game {
         this.renderer.render();
 
         requestAnimationFrame(() => this.gameLoop());
+    }
+
+    setupInitialPlayerState() {
+        // Find two nearby connected systems with compatible exports/imports
+        const systems = this.starSystemManager.starSystems;
+        let startRoute = null;
+
+        // Search for a good starting route between nearby systems
+        for (let i = 0; i < systems.length && !startRoute; i++) {
+            const sys1 = systems[i];
+            // Find connected systems through hyperlanes
+            const connectedIds = this.starSystemManager.hyperLanes
+                .filter((lane) => lane.from === sys1.id || lane.to === sys1.id)
+                .map((lane) => (lane.from === sys1.id ? lane.to : lane.from));
+
+            for (const sys2Id of connectedIds) {
+                const sys2 = systems[sys2Id];
+
+                // Check if sys1 exports something sys2 imports
+                for (const exp of sys1.exports) {
+                    const imp = sys2.imports.find((i) => i.id === exp.id);
+                    if (imp && imp.price - exp.price > 0) {
+                        startRoute = {
+                            from: sys1,
+                            to: sys2,
+                            good: exp.id,
+                            profit: imp.price - exp.price,
+                        };
+                        break;
+                    }
+                }
+                if (startRoute) break;
+            }
+        }
+
+        if (!startRoute) {
+            // If no direct route found, use first two systems
+            startRoute = {
+                from: systems[0],
+                to: systems[1],
+                good: systems[0].exports[0]?.id || 'electronics',
+                profit: 50,
+            };
+        }
+
+        // Add depots in both systems
+        this.gameState.addDepot(startRoute.from.id);
+        this.gameState.addDepot(startRoute.to.id);
+
+        // Create two vehicles (one for the route, one spare)
+        const vehicle1 = this.vehicleManager.createVehicle();
+        this.vehicleManager.createVehicle();
+
+        // Create the initial route
+        this.routeManager.createRoute(
+            startRoute.from.id,
+            startRoute.to.id,
+            startRoute.good,
+            vehicle1.id
+        );
+
+        // Select the first system so the player can see their starting position
+        this.renderer.setSelectedSystem(startRoute.from);
+        this.uiManager.setSelectedSystem(startRoute.from);
+
+        // Adjust starting credits (subtract costs already "spent" on initial setup)
+        // 2 depots (500 each = 1000) + 2 vehicles (2000 each = 4000) = 5000 total
+        // Player starts with 10000, so they should have 5000 left after setup
+        // The initial setup is a "bonus" so we don't deduct anything
     }
 }
 

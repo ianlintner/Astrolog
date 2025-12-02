@@ -158,9 +158,136 @@
             .loss {
                 color: #f00;
             }
+            #welcome-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 2000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .modal-content {
+                background: #111;
+                border: 2px solid #0f0;
+                padding: 30px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+            .modal-content h2 {
+                color: #0ff;
+                text-shadow: 0 0 10px #0ff;
+                margin-bottom: 20px;
+            }
+            .modal-content p {
+                margin: 10px 0;
+                line-height: 1.6;
+            }
+            .modal-content ul {
+                margin: 10px 0 10px 20px;
+            }
+            .modal-content li {
+                margin: 5px 0;
+            }
+            .highlight {
+                color: #0ff;
+                font-weight: bold;
+            }
+            .start-button {
+                background: #004400;
+                color: #0f0;
+                border: 2px solid #0f0;
+                padding: 15px 30px;
+                font-size: 16px;
+                cursor: pointer;
+                margin-top: 20px;
+                width: 100%;
+                font-family: 'Courier New', monospace;
+            }
+            .start-button:hover {
+                background: #006600;
+                box-shadow: 0 0 20px #0f0;
+            }
+            #help-button {
+                position: fixed;
+                top: 10px;
+                right: 370px;
+                background: #003300;
+                color: #0f0;
+                border: 1px solid #0f0;
+                padding: 5px 10px;
+                cursor: pointer;
+                z-index: 1500;
+                font-family: 'Courier New', monospace;
+            }
+            #help-button:hover {
+                background: #005500;
+            }
         </style>
     </head>
     <body>
+        <!-- Welcome Modal -->
+        <div id="welcome-modal">
+            <div class="modal-content">
+                <h2>🚀 Welcome to Space Logistics Tycoon!</h2>
+                <p>
+                    Build a galactic trade empire across 100 star systems! You've been given a
+                    <span class="highlight">starter package</span> to begin your journey:
+                </p>
+                <ul>
+                    <li><span class="highlight">2 Depots</span> in nearby connected systems</li>
+                    <li><span class="highlight">2 Transport Ships</span> (1 active, 1 spare)</li>
+                    <li>
+                        <span class="highlight">1 Active Trade Route</span> already earning credits
+                    </li>
+                    <li><span class="highlight">10,000 Credits</span> for expansion</li>
+                </ul>
+
+                <h3 style="color: #0ff; margin-top: 20px">Quick Start Guide</h3>
+                <p>
+                    <strong>1. Expand Your Network:</strong> Click on star systems to select them,
+                    then buy depots (500cr) in systems with good exports/imports.
+                </p>
+                <p>
+                    <strong>2. Add Vehicles:</strong> Buy more transports (2000cr) to run more
+                    routes.
+                </p>
+                <p>
+                    <strong>3. Create Routes:</strong> Use the dropdowns to connect systems with
+                    depots. Match exports → imports for profit!
+                </p>
+                <p>
+                    <strong>4. Compete:</strong> AI corporations are building routes too. Buy
+                    exclusive trade rights (5000cr) to protect your best routes.
+                </p>
+
+                <h3 style="color: #0ff; margin-top: 20px">Controls</h3>
+                <p>
+                    <strong>Pan:</strong> Click & drag the map | <strong>Zoom:</strong> Mouse wheel
+                    | <strong>Select:</strong> Click systems
+                </p>
+
+                <button
+                    class="start-button"
+                    onclick="document.getElementById('welcome-modal').style.display='none'"
+                >
+                    🚀 Start Playing!
+                </button>
+            </div>
+        </div>
+
+        <!-- Help Button -->
+        <button
+            id="help-button"
+            onclick="document.getElementById('welcome-modal').style.display='flex'"
+        >
+            ? Help
+        </button>
+
         <div id="game-container">
             <div id="canvas-container">
                 <canvas id="gameCanvas"></canvas>
