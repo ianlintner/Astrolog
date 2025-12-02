@@ -144,7 +144,9 @@ class Game {
                 .map((lane) => (lane.from === sys1.id ? lane.to : lane.from));
 
             for (const sys2Id of connectedIds) {
-                const sys2 = systems[sys2Id];
+                // Find system by ID (don't assume array index equals system ID)
+                const sys2 = systems.find((s) => s.id === sys2Id);
+                if (!sys2) continue;
 
                 // Check if sys1 exports something sys2 imports
                 for (const exp of sys1.exports) {
@@ -163,23 +165,45 @@ class Game {
             }
         }
 
+        // Fallback: if no profitable route found, search for any valid export/import match
+        if (!startRoute && systems.length >= 2) {
+            for (let i = 0; i < systems.length && !startRoute; i++) {
+                const sys1 = systems[i];
+                if (!sys1.exports || sys1.exports.length === 0) continue;
+
+                for (let j = 0; j < systems.length && !startRoute; j++) {
+                    if (i === j) continue;
+                    const sys2 = systems[j];
+                    if (!sys2.imports) continue;
+
+                    for (const exp of sys1.exports) {
+                        const imp = sys2.imports.find((item) => item.id === exp.id);
+                        if (imp) {
+                            startRoute = {
+                                from: sys1,
+                                to: sys2,
+                                good: exp.id,
+                                profit: Math.max(imp.price - exp.price, 10),
+                            };
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // If still no route found (shouldn't happen), skip initial setup
         if (!startRoute) {
-            // If no direct route found, use first two systems
-            startRoute = {
-                from: systems[0],
-                to: systems[1],
-                good: systems[0].exports[0]?.id || 'electronics',
-                profit: 50,
-            };
+            return;
         }
 
         // Add depots in both systems
         this.gameState.addDepot(startRoute.from.id);
         this.gameState.addDepot(startRoute.to.id);
 
-        // Create two vehicles (one for the route, one spare)
+        // Create two vehicles: one for the route, one spare for expansion
         const vehicle1 = this.vehicleManager.createVehicle();
-        this.vehicleManager.createVehicle();
+        this.vehicleManager.createVehicle(); // Spare vehicle (result not needed)
 
         // Create the initial route
         this.routeManager.createRoute(
@@ -193,10 +217,8 @@ class Game {
         this.renderer.setSelectedSystem(startRoute.from);
         this.uiManager.setSelectedSystem(startRoute.from);
 
-        // Adjust starting credits (subtract costs already "spent" on initial setup)
-        // 2 depots (500 each = 1000) + 2 vehicles (2000 each = 4000) = 5000 total
-        // Player starts with 10000, so they should have 5000 left after setup
-        // The initial setup is a "bonus" so we don't deduct anything
+        // Note: The initial infrastructure is a starter bonus - costs are not deducted
+        // Cost reference: Depots = 500cr each, Vehicles = 2000cr each (defined in UIManager.js)
     }
 }
 
