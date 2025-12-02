@@ -10,7 +10,18 @@ export class UIManager {
         this.selectedSystem = null;
         this.tooltip = document.getElementById('tooltip');
 
+        this.saveManager = null;
+        this.saveCallback = null;
+        this.resetCallback = null;
+
         this.setupButtonListeners();
+    }
+
+    setSaveManager(saveManager, saveCallback, resetCallback) {
+        this.saveManager = saveManager;
+        this.saveCallback = saveCallback;
+        this.resetCallback = resetCallback;
+        this.setupSaveButtonListeners();
     }
 
     setupButtonListeners() {
@@ -28,6 +39,41 @@ export class UIManager {
         document
             .getElementById('btn-buy-exclusive')
             .addEventListener('click', () => this.buyExclusiveRights());
+    }
+
+    setupSaveButtonListeners() {
+        const saveBtn = document.getElementById('btn-save-game');
+        const resetBtn = document.getElementById('btn-reset-game');
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveGame());
+        }
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => this.resetGame());
+        }
+    }
+
+    saveGame() {
+        if (this.saveCallback) {
+            const success = this.saveCallback();
+            if (success) {
+                alert('Game saved successfully!');
+            } else {
+                alert('Failed to save game.');
+            }
+        }
+    }
+
+    resetGame() {
+        if (this.resetCallback) {
+            if (
+                confirm(
+                    'Are you sure you want to start a new game? Your current progress will be lost.'
+                )
+            ) {
+                this.resetCallback();
+            }
+        }
     }
 
     setSelectedSystem(system) {
