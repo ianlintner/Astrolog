@@ -1,7 +1,10 @@
 // StarSystem.js - Star system generation and management
+import { Random } from './Random.js';
+
 export class StarSystemManager {
-    constructor(gameState) {
+    constructor(gameState, random = new Random()) {
         this.gameState = gameState;
+        this.random = random;
         this.starSystems = [];
         this.hyperLanes = [];
     }
@@ -68,9 +71,9 @@ export class StarSystemManager {
             const system = {
                 id: i,
                 name: baseName + suffix,
-                x: gridX + (Math.random() - 0.5) * 80,
-                y: gridY + (Math.random() - 0.5) * 80,
-                population: Math.floor(Math.random() * 10) + 1,
+                x: gridX + (this.random.next() - 0.5) * 80,
+                y: gridY + (this.random.next() - 0.5) * 80,
+                population: this.random.int(10) + 1,
                 exports: [],
                 imports: [],
                 color: this.getRandomStarColor(),
@@ -84,8 +87,7 @@ export class StarSystemManager {
     }
 
     getRandomStarColor() {
-        const colors = ['#fff', '#ffa', '#aaf', '#faa', '#faf'];
-        return colors[Math.floor(Math.random() * colors.length)];
+        return this.random.pick(['#fff', '#ffa', '#aaf', '#faa', '#faf']);
     }
 
     generateHyperLanes() {
@@ -102,7 +104,7 @@ export class StarSystemManager {
                 .filter((d) => d.idx !== i && d.dist < maxDistance)
                 .sort((a, b) => a.dist - b.dist);
 
-            const connectCount = Math.min(Math.floor(Math.random() * 2) + 2, distances.length);
+            const connectCount = Math.min(this.random.int(2) + 2, distances.length);
 
             for (let j = 0; j < connectCount; j++) {
                 const sys2Idx = distances[j].idx;
@@ -125,16 +127,16 @@ export class StarSystemManager {
 
     assignSystemEconomies() {
         this.starSystems.forEach((system) => {
-            const exportCount = Math.floor(Math.random() * 2) + 1;
-            const importCount = Math.floor(Math.random() * 3) + 2;
+            const exportCount = this.random.int(2) + 1;
+            const importCount = this.random.int(3) + 2;
 
             const availableGoods = [...this.gameState.goodsTypes];
             for (let i = 0; i < exportCount; i++) {
-                const idx = Math.floor(Math.random() * availableGoods.length);
+                const idx = this.random.int(availableGoods.length);
                 const good = availableGoods.splice(idx, 1)[0];
                 system.exports.push({
                     ...good,
-                    price: Math.floor(good.basePrice * (0.7 + Math.random() * 0.3)),
+                    price: Math.floor(good.basePrice * (0.7 + this.random.next() * 0.3)),
                 });
             }
 
@@ -143,11 +145,11 @@ export class StarSystemManager {
             );
 
             for (let i = 0; i < importCount && importPool.length > 0; i++) {
-                const idx = Math.floor(Math.random() * importPool.length);
+                const idx = this.random.int(importPool.length);
                 const good = importPool.splice(idx, 1)[0];
                 system.imports.push({
                     ...good,
-                    price: Math.floor(good.basePrice * (1.3 + Math.random() * 0.5)),
+                    price: Math.floor(good.basePrice * (1.3 + this.random.next() * 0.5)),
                 });
             }
         });

@@ -3,13 +3,16 @@
     "version": "1.0.0",
     "description": "A browser-based space logistics management game",
     "main": "game.js",
+    "type": "module",
     "scripts": {
         "lint": "eslint src/**/*.js",
         "lint:fix": "eslint src/**/*.js --fix",
-        "format": "prettier --write \"*.{js,html,md,json}\" \"src/**/*.js\"",
-        "format:check": "prettier --check \"*.{js,html,md,json}\" \"src/**/*.js\"",
-        "test": "echo 'Running validation checks...' && npm run lint && npm run format:check",
-        "validate": "npm run test"
+        "format": "prettier --write \"*.{js,mjs,html,md,json}\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\" \"src/**/*.js\"",
+        "format:check": "prettier --check \"*.{js,mjs,html,md,json}\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\" \"src/**/*.js\"",
+        "test": "npm run lint && npm run format:check && npm run test:unit",
+        "test:unit": "node --test tests/unit",
+        "test:smoke": "playwright test",
+        "validate": "npm test"
     },
     "repository": {
         "type": "git",
@@ -29,6 +32,7 @@
     },
     "homepage": "https://github.com/ianlintner/Astrolog#readme",
     "devDependencies": {
+        "@playwright/test": "^1.65.1",
         "eslint": "^8.57.0",
         "eslint-config-prettier": "^9.1.0",
         "prettier": "^3.2.5"

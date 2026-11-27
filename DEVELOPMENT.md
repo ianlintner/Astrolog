@@ -61,14 +61,47 @@ git push origin feature/your-feature
 
 ## Available NPM Scripts
 
-| Command                | Description                |
-| ---------------------- | -------------------------- |
-| `npm run lint`         | Check code with ESLint     |
-| `npm run lint:fix`     | Auto-fix ESLint issues     |
-| `npm run format`       | Format code with Prettier  |
-| `npm run format:check` | Check if code is formatted |
-| `npm test`             | Run all validation checks  |
-| `npm run validate`     | Alias for npm test         |
+| Command                | Description                       |
+| ---------------------- | --------------------------------- |
+| `npm run lint`         | Check code with ESLint            |
+| `npm run lint:fix`     | Auto-fix ESLint issues            |
+| `npm run format`       | Format code with Prettier         |
+| `npm run format:check` | Check if code is formatted        |
+| `npm test`             | Lint, format check and unit tests |
+| `npm run test:unit`    | Run `node:test` unit tests        |
+| `npm run test:smoke`   | Run Playwright core-loop smoke    |
+| `npm run validate`     | Alias for npm test                |
+
+## Deterministic worlds and tests
+
+Add `?seed=<int>` to the URL for a reproducible world (same seed, same systems, prices and AI
+rolls). Without it a seed is generated on each fresh game. The seed and generator position are
+stored in the save, so reloading restores the world and future rolls continue from where they
+left off. Save files from before v2 are ignored and start a fresh game.
+
+`?test=1` exposes the running `Game` instance as `window.__astrolog` for tests only. It has no
+effect without the flag.
+
+### Unit tests
+
+```bash
+npm run test:unit    # or npm test for lint + format + unit
+```
+
+### Playwright smoke
+
+The smoke drives the real UI at 1280x720 against a dependency-free server that serves the repo
+under `/astrolog/` (matching the hub deployment). Install Chromium once, then run:
+
+```bash
+npx playwright install chromium
+npm run test:smoke
+```
+
+The spec loads `/astrolog/?seed=42&test=1`, starts from the welcome modal, buys a depot and a
+second route through the UI, advances 60 s of game time, verifies save/reload and New Game, and
+fails on any console error, page error or failed request. `test-results/` and
+`playwright-report/` are generated and ignored by git and Prettier.
 
 ## CI/CD Pipeline
 
@@ -93,6 +126,10 @@ The GitHub Actions workflow runs automatically on:
     - Starts local server
     - Tests if game files load
     - Verifies no 404 errors
+
+4. **Smoke**
+    - Lint, format and `node:test` unit tests
+    - Playwright core-loop at `/astrolog/` (Chromium)
 
 ## Code Standards
 

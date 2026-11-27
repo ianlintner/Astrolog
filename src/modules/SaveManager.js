@@ -2,7 +2,7 @@
 export class SaveManager {
     constructor() {
         this.storageKey = 'space-logistics-tycoon-save';
-        this.version = 1; // Version for save format compatibility
+        this.version = 2; // Version for save format compatibility (v2 adds the RNG seed)
     }
 
     /**
@@ -20,13 +20,22 @@ export class SaveManager {
      * @param {Object} vehicleManager - VehicleManager instance
      * @param {Object} routeManager - RouteManager instance
      * @param {Object} aiCompetitorManager - AICompetitorManager instance
+     * @param {Object} random - Seeded Random instance used for world/AI decisions
      * @returns {boolean} - Whether save was successful
      */
-    saveGame(gameState, starSystemManager, vehicleManager, routeManager, aiCompetitorManager) {
+    saveGame(
+        gameState,
+        starSystemManager,
+        vehicleManager,
+        routeManager,
+        aiCompetitorManager,
+        random
+    ) {
         try {
             const saveData = {
                 version: this.version,
                 timestamp: Date.now(),
+                rng: random ? { seed: random.seed, state: random.getState() } : null,
                 gameState: this.serializeGameState(gameState),
                 starSystems: this.serializeStarSystems(starSystemManager),
                 vehicles: this.serializeVehicles(vehicleManager),

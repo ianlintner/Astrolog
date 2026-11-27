@@ -1,10 +1,13 @@
 // AICompetitor.js - AI player management and decision-making
+import { Random } from './Random.js';
+
 export class AICompetitorManager {
-    constructor(gameState, starSystemManager, vehicleManager, routeManager) {
+    constructor(gameState, starSystemManager, vehicleManager, routeManager, random = new Random()) {
         this.gameState = gameState;
         this.starSystemManager = starSystemManager;
         this.vehicleManager = vehicleManager;
         this.routeManager = routeManager;
+        this.random = random;
 
         this.aiPlayers = [];
     }
@@ -60,7 +63,7 @@ export class AICompetitorManager {
         const profitableSystems = this.findProfitableSystems();
 
         for (const systemId of profitableSystems) {
-            if (aiPlayer.credits >= 500 && Math.random() < aiPlayer.efficiency) {
+            if (aiPlayer.credits >= 500 && this.random.next() < aiPlayer.efficiency) {
                 // Buy depot
                 if (!aiPlayer.depots[systemId]) {
                     aiPlayer.depots[systemId] = 0;
@@ -78,7 +81,7 @@ export class AICompetitorManager {
             (id) => aiPlayer.depots[id] > 0
         );
         for (const systemId of depotsSystemIds) {
-            if (aiPlayer.credits >= 1000 && Math.random() < aiPlayer.efficiency * 0.7) {
+            if (aiPlayer.credits >= 1000 && this.random.next() < aiPlayer.efficiency * 0.7) {
                 if (!aiPlayer.warehouses[systemId]) {
                     aiPlayer.warehouses[systemId] = 0;
                 }
@@ -91,7 +94,7 @@ export class AICompetitorManager {
         }
 
         // AI considers buying vehicles
-        if (aiPlayer.credits >= 2000 && Math.random() < aiPlayer.aggression) {
+        if (aiPlayer.credits >= 2000 && this.random.next() < aiPlayer.aggression) {
             const vehicle = {
                 id: `ai${aiPlayer.id}_vehicle_${aiPlayer.vehicles.length}`,
                 name: `${aiPlayer.name} Transport-${aiPlayer.vehicles.length + 1}`,
@@ -223,13 +226,13 @@ export class AICompetitorManager {
 
     evaluateAndBidOnExclusiveRights(aiPlayer) {
         // AI may try to acquire exclusive rights to a route
-        if (aiPlayer.credits < 5000 || Math.random() > aiPlayer.aggression) return;
+        if (aiPlayer.credits < 5000 || this.random.next() > aiPlayer.aggression) return;
 
         const activeRoutes = aiPlayer.routes.filter((r) => r.active && !r.hasExclusiveRights);
         if (activeRoutes.length === 0) return;
 
         // Pick a random profitable route
-        const route = activeRoutes[Math.floor(Math.random() * activeRoutes.length)];
+        const route = activeRoutes[Math.floor(this.random.next() * activeRoutes.length)];
         const exclusiveCost = 5000; // Base cost for exclusive rights
 
         if (aiPlayer.credits >= exclusiveCost) {

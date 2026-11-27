@@ -8,6 +8,7 @@ import { InputHandler } from './modules/InputHandler.js';
 import { UIManager } from './modules/UIManager.js';
 import { AICompetitorManager } from './modules/AICompetitor.js';
 import { SaveManager } from './modules/SaveManager.js';
+import { Random, seedFromSearch } from './modules/Random.js';
 
 class Game {
     constructor() {
@@ -17,12 +18,21 @@ class Game {
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
 
-        // Initialize save manager
+        // Initialize save manager and the seeded generator. A saved game keeps its seed
+        // (and generator position); otherwise use ?seed=<int> or a fresh random seed.
         this.saveManager = new SaveManager();
+        const savedGame = this.saveManager.loadGame();
+        const urlSeed = seedFromSearch(window.location.search);
+        const seed =
+            savedGame?.rng?.seed ?? urlSeed ?? crypto.getRandomValues(new Uint32Array(1))[0];
+        this.random = new Random(seed);
+        if (savedGame?.rng?.state !== undefined) {
+            this.random.setState(savedGame.rng.state);
+        }
 
         // Initialize modules
         this.gameState = new GameState();
-        this.starSystemManager = new StarSystemManager(this.gameState);
+        this.starSystemManager = new StarSystemManager(this.gameState, this.random);
         this.vehicleManager = new VehicleManager();
         this.routeManager = new RouteManager(
             this.gameState,
@@ -35,11 +45,11 @@ class Game {
             this.gameState,
             this.starSystemManager,
             this.vehicleManager,
-            this.routeManager
+            this.routeManager,
+            this.random
         );
 
         // Try to load saved game, otherwise start new game
-        const savedGame = this.saveManager.loadGame();
         if (savedGame) {
             this.loadSavedGame(savedGame);
         } else {
@@ -131,7 +141,8 @@ class Game {
             this.starSystemManager,
             this.vehicleManager,
             this.routeManager,
-            this.aiCompetitorManager
+            this.aiCompetitorManager,
+            this.random
         );
     }
 
@@ -281,5 +292,9 @@ class Game {
 
 // Initialize game when page loads
 window.addEventListener('load', () => {
-    new Game();
+    const game = new Game();
+    // Test-only handle for the Playwright core-loop smoke; no behavior change otherwise.
+    if (new URLSearchParams(window.location.search).get('test') === '1') {
+        window.__astrolog = game;
+    }
 });
