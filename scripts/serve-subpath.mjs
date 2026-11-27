@@ -29,7 +29,14 @@ const server = createServer(async (req, res) => {
         return;
     }
 
-    let relative = decodeURIComponent(pathname.slice(prefix.length));
+    let relative;
+    try {
+        relative = decodeURIComponent(pathname.slice(prefix.length));
+    } catch {
+        // Malformed percent-encoding must not take down the smoke server.
+        notFound(res);
+        return;
+    }
     if (!relative || relative.endsWith('/')) relative += 'index.html';
     const filePath = resolve(root, relative);
     if (filePath !== root && !filePath.startsWith(root + sep)) {

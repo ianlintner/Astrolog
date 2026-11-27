@@ -108,7 +108,24 @@ test('core loop: seed, build a route, advance time, save and reset', async ({ pa
     expect(after.credits).toBeGreaterThan(before.credits);
     await expect(page.locator('#day')).toHaveText(String(after.day));
 
+    // The 60-second advance also triggers autosaves, so remove the autosaved
+    // entry and stop the interval: this must prove the Save button itself works.
+    await page.evaluate(() => {
+        clearInterval(window.__astrolog.autoSaveInterval);
+        localStorage.removeItem('space-logistics-tycoon-save');
+    });
+    expect(
+        await page.evaluate(() => localStorage.getItem('space-logistics-tycoon-save'))
+    ).toBeNull();
+
     await page.locator('#btn-save-game').click();
+    const persisted = await page.evaluate(() =>
+        JSON.parse(localStorage.getItem('space-logistics-tycoon-save'))
+    );
+    expect(persisted?.version).toBe(2);
+    expect(persisted?.gameState?.day).toBe(after.day);
+    expect(persisted?.gameState?.credits).toBe(after.credits);
+
     const saved = await readStats();
     await page.reload();
     await page.waitForFunction(
@@ -125,6 +142,10 @@ test('core loop: seed, build a route, advance time, save and reset', async ({ pa
     await page.locator('#btn-reset-game').click();
     await page.waitForFunction(() => window.__astrolog?.gameState?.day === 1);
     await expect(page.locator('#day')).toHaveText('1');
+
+    // The smoke server must survive malformed URL encoding and keep serving.
+    expect((await page.request.get('/astrolog/%ZZ')).status()).toBe(404);
+    expect((await page.request.get('/astrolog/')).status()).toBe(200);
 
     expect(consoleErrors, `console errors: ${consoleErrors.join('; ')}`).toEqual([]);
     expect(pageErrors, `page errors: ${pageErrors.join('; ')}`).toEqual([]);
